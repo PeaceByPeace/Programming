@@ -1,6 +1,7 @@
 import os
 from flask_mail import Mail, Message
-from flask import Flask, render_template, request, redirect
+from flask_session import Session
+from flask import Flask, render_template, request, redirect, session
 from cs50 import SQL
 
 app = Flask(__name__)
@@ -16,8 +17,13 @@ app.config["MAIL_PORT"] = 587
 app.config["MAIL_SERVER"] = "smtp.gmail.com"
 app.config["MAIL_USE_TLS"] = True
 app.config["MAIL_USERNAME"] = os.environ["MAIL_USERNAME"]
+app.config["SESSION_PERMAMENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
 
+Session(app)
 mail = Mail(app)
+
+
 db = SQL("sqlite:///froshims.db")
 
 
@@ -61,6 +67,7 @@ def register():
     db.execute("INSERT INTO registrants (name, sport) VALUES(?, ?)", name, sport)
     message = Message("You are registered", recipients=[e_mail], body=f'Your name is {name} and your favorite sport is {sport}')
     mail.send(message)
+
     return redirect("/registrants")
 
 
